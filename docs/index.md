@@ -1,31 +1,27 @@
-# Fancentro API Client Example
+---
+title: modelvi-fancentro-client — schedule posts to Fancentro via ModelVI
+description: A minimal example that schedules posts to Fancentro through the ModelVI partner API. Not an official Fancentro API.
+---
 
-A minimal, open-source example client for the **Fancentro API**, built to help developers get started with **Fancentro automation** quickly.
+# Schedule posts to Fancentro via ModelVI
 
-This project is a small, readable starting point — copy it, understand it in minutes, and build your real integration on top.
+A minimal, open **example integration** that schedules content to **Fancentro** through the
+[ModelVI](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=modelvi-fancentro-client)
+partner API (platform code `FNC`).
 
-## What you get
-
-- A tiny `FancentroClient` you can extend endpoint-by-endpoint
-- API key loaded from the environment (no hard-coded secrets)
-- A single placeholder call so you can verify connectivity end-to-end
+> **Honest scope:** ModelVI is an independent posting tool; Fancentro is a third-party
+> platform ModelVI posts _to_. This is **not** an official Fancentro API and is not
+> affiliated with Fancentro.
 
 ## Get started
 
-1. **[Get your API key at fancentroapi.com](https://fancentroapi.com)** — required
-2. Clone the repo and install dependencies
-3. Add your key to `.env`
-4. Run the example
+1. **[Get your API key →](https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=modelvi-fancentro-client)**
+2. Reference: [modelvi.com/agent-api](https://modelvi.com/agent-api).
+3. Post via `POST /schedule` with `platforms: ["FNC"]`.
 
-See the [README on GitHub](https://github.com/<your-org>/fancentro-api-client-example) for full setup steps.
+## Use cases / keywords
 
-## Important: this is an example
+fancentro posting bot · postbot fancentro · fancentro automation · fancentro scheduler · schedule fancentro posts.
 
-This repository demonstrates the **client pattern** — it is not a production SDK. Endpoint paths are placeholders. For the live endpoints, authentication details, and request/response schemas, always refer to the official documentation.
-
-- **API service & signup:** [fancentroapi.com](https://fancentroapi.com)
-- **API docs:** [fancentroapi.com/docs](https://fancentroapi.com/docs)
-
----
-
-_"Fancentro" is a trademark of its respective owner. This is an independent, unofficial example client and is not affiliated with or endorsed by that owner._
+- API key: <https://modelvi.com/sign-up?utm_source=github&utm_medium=owned-track&utm_campaign=modelvi-fancentro-client>
+- Pricing: <https://modelvi.com/pricing>

@@ -1,11 +1,11 @@
 {
-  "links_to": "https://fancentroapi.com",
+  "links_to": "https://modelvi.com",
   "keywords": [
-    "fancentro api",
+    "fancentro posting bot",
+    "postbot fancentro",
     "fancentro automation",
-    "fancentro api client",
-    "fancentro api example",
-    "fancentro integration"
+    "fancentro scheduler",
+    "schedule fancentro posts"
   ],
-  "tagline": "A minimal, open-source example client for the Fancentro API \u2014 a clean starting point for Fancentro automation."
+  "tagline": "Schedule posts to Fancentro via the ModelVI partner API. Not an official Fancentro API — ModelVI posts to Fancentro as a third-party platform."
 }

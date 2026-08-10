@@ -1,90 +1,67 @@
+#!/usr/bin/env python3
 """
-Minimal example client for the Fancentro API (via fancentroapi.com).
+modelvi-fancentro-client
 
-This is an EXAMPLE integration. It shows the smallest useful pattern for
-authenticating with your API key and making a request. The endpoint path
-below is a PLACEHOLDER -- replace it with a real endpoint from the docs:
+Schedule a post to Fancentro via the public ModelVI partner API.
 
-    https://fancentroapi.com/docs
+Honest scope: ModelVI is an independent posting tool; Fancentro is a third-party
+platform ModelVI posts TO. This is NOT an official Fancentro API. It uses ModelVI's
+partner API with platform code "FNC".
 
-Get your API key at:
+  Get an API key:  https://modelvi.com/sign-up
+  API reference:   https://modelvi.com/agent-api
 
-    https://fancentroapi.com
+Minimal EXAMPLE (no retries/pagination/media upload).
+
+  export MODELVI_API_KEY="mvk_<keyId>_<secret>"
+  python example.py
 """
 
 import os
 import sys
+from datetime import datetime, timezone, timedelta
 
 import requests  # pip install requests
 
-
-class FancentroClient:
-    """A tiny, extendable client for the Fancentro API.
-
-    Extend this class with one method per endpoint you need. Keeping the
-    HTTP details in one place keeps your integration code readable and
-    makes Fancentro automation easier to maintain over time.
-    """
-
-    def __init__(self, api_key: str, base_url: str, timeout: int = 30):
-        if not api_key:
-            raise ValueError(
-                "Missing API key. Set API_KEY in your environment. "
-                "Get one at https://fancentroapi.com"
-            )
-        self.base_url = base_url.rstrip("/")
-        self.timeout = timeout
-        self.session = requests.Session()
-        # An Authorization header is a common pattern. Confirm the exact
-        # scheme the API expects (Bearer token, custom header, etc.) in the
-        # official docs: https://fancentroapi.com/docs
-        self.session.headers.update(
-            {
-                "Authorization": f"Bearer {api_key}",
-                "Accept": "application/json",
-            }
-        )
-
-    def ping(self) -> requests.Response:
-        """Call a PLACEHOLDER endpoint to confirm connectivity.
-
-        NOTE: "/v1/ping" is NOT guaranteed to exist. Replace it with a real
-        endpoint from https://fancentroapi.com/docs (for example an account
-        or status endpoint) before using this for anything real.
-        """
-        # --- replace with the real endpoint from fancentroapi.com/docs ---
-        url = f"{self.base_url}/v1/ping"
-        # -----------------------------------------------------------------
-        return self.session.get(url, timeout=self.timeout)
+BASE_URL = os.environ.get("MODELVI_API_BASE", "https://modelvi.com/api/partner/v1")
+API_KEY = os.environ.get("MODELVI_API_KEY")
+SIGNUP_URL = "https://modelvi.com/sign-up"
+PLATFORM = "FNC"  # Fancentro platform code
 
 
-def main() -> int:
-    # Read config from the environment (see .env.example).
-    api_key = os.environ.get("API_KEY", "")
-    base_url = os.environ.get("BASE_URL", "https://fancentroapi.com")
+def _headers():
+    if not API_KEY:
+        sys.exit(f"Missing MODELVI_API_KEY. Get a key at {SIGNUP_URL} and export it.")
+    return {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
 
-    try:
-        client = FancentroClient(api_key=api_key, base_url=base_url)
-    except ValueError as err:
-        print(f"Config error: {err}", file=sys.stderr)
-        return 1
 
-    print(f"Calling placeholder endpoint on {base_url} ...")
+def _payload(resp):
+    if resp.status_code == 401:
+        sys.exit(f"Unauthorized (401). Get a valid key at {SIGNUP_URL}")
+    resp.raise_for_status()
+    body = resp.json()
+    return body.get("payload", body)
 
-    try:
-        response = client.ping()
-    except requests.RequestException as err:
-        print(f"Request failed: {err}", file=sys.stderr)
-        return 1
 
-    # We deliberately DO NOT assume a response schema here: this is an example,
-    # and the real response shape is defined by the API docs, not by us.
-    print(f"HTTP status: {response.status_code}")
-    print("Raw response body (shape defined by the API -- see the docs):")
-    print(response.text)
+def main():
+    models = _payload(requests.get(f"{BASE_URL}/model_list", headers=_headers(), timeout=30))
+    if not models:
+        sys.exit("No models on this account yet — add one in your ModelVI dashboard.")
+    model = models[0] if isinstance(models, list) else models.get("items", [{}])[0]
+    model_id = model.get("id") or model.get("model")
 
-    return 0
+    when = datetime.now(timezone.utc) + timedelta(minutes=5)
+    body = {
+        "model": model_id,
+        "platforms": [PLATFORM],
+        "title": "New drop is live ✨",          # the caption field is `title`
+        "scheduledAt": when.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "type": 1,                                # 1=FREE, 2=FANS, 3=PAID
+    }
+    print(f"POST {BASE_URL}/schedule → {PLATFORM}")
+    print("Scheduled:", _payload(requests.post(f"{BASE_URL}/schedule", json=body,
+                                               headers=_headers(), timeout=30)))
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
